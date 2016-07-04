@@ -1,3 +1,5 @@
+#安装
+`npm install r1N0Xmk2/auth-module --save` 或 `svn:CloudMeeting`
 #使用方法
 建立`auth-model.js`文件
 ```javascript
