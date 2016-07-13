@@ -47,6 +47,36 @@ function init (options) {
             url: '/authMD5',
             method: 'POST',
             token: true
+        }, {
+            name: 'getUserByPhoneNum',
+            url: '/getUserByPhoneNum',
+            method: 'POST',
+            token: true
+        }, {
+            name: 'signInByPhoneNum',
+            url: '/signInByPhoneNum',
+            method: 'POST',
+            token: true
+        }, {
+            name: 'checkPhoneNum',
+            url: '/checkPhoneNum',
+            method: 'POST',
+            token: true
+        }, {
+            name: 'sendSMS',
+            url: '/sendSMS',
+            method: 'POST',
+            token: true
+        }, {
+            name: 'verifySMSCode',
+            url: '/verifySMSCode',
+            method: 'POST',
+            token: true
+        }, {
+            name: 'registerUserByPhone',
+            url: '/registerUserByPhone',
+            method: 'POST',
+            token: true
         }
     ];
     // init necessary fields
@@ -158,10 +188,20 @@ function init (options) {
                         request(reqOptions, function (err, res, body) {
                             if (err) {
                                 callback(err);
-                            } else if (body && body.res > 0){
-                                callback(null, body);
+                            } else if (body){
+                                try{
+                                    if (typeof body == 'string')
+                                        body=JSON.parse(body);
+                                }catch(e){
+                                    return callback('Parse result Error')
+                                }
+                                if (body.res > 0) {
+                                    callback(null, body);
+                                } else {
+                                    callback(body);
+                                }
                             } else {
-                                callback(body);
+                                callback('Request return not comply with standard');
                             }
                         });
                     }]
