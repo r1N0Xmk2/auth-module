@@ -58,6 +58,11 @@ function init (options) {
             method: 'POST',
             token: true
         }, {
+            name: 'getCaptcha',
+            url: '/getCaptcha',
+            method: 'GET',
+            token: true
+        }, {
             name: 'checkPhoneNum',
             url: '/checkPhoneNum',
             method: 'POST',
@@ -193,7 +198,7 @@ function init (options) {
                                     if (typeof body == 'string')
                                         body=JSON.parse(body);
                                 }catch(e){
-                                    return callback('Parse result Error')
+                                    return callback('Auth module Parse result Error')
                                 }
                                 if (body.res > 0) {
                                     callback(null, body);
