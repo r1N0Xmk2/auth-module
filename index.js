@@ -134,16 +134,22 @@ function init (options) {
                 });
             }
         };
-        async.retry({times: 5, interval: 5000}, function (cb, ret) {
-            model.getToken({}, cb);
-        }, function (err, res) {
-            if (err) {
-                console.error('init get Token Fail');
-            } else {
-                model.token = res.token;
-                console.log('token get', new Date(), model.token);
-            }
-        });
+        async.whilst(function () {
+            return !model.token
+        }, function (callback) {
+            async.retry({times: 5, interval: 1 * 60 * 1000}, function (cb, ret) {
+                model.getToken({}, cb);
+            }, function (err, res) {
+                if (err) {
+                    console.error('init get Token Fail');
+                } else {
+                    model.token = res.token;
+                    console.log('token get', new Date(), model.token);
+                }
+                callback();
+            });
+        }, function (err) {
+        })
         ownedFuns.forEach(function (fun) {
             //console.log('create function', fun.name);
             model[fun.name] = function (params, cb) {
