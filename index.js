@@ -82,6 +82,41 @@ function init (options) {
             url: '/registerUserByPhone',
             method: 'POST',
             token: true
+        },{
+            name: 'emailBind',
+            url: '/emailBind',
+            method: 'POST',
+            token: true
+        },{
+            name: 'updateUserName',
+            url: '/updateUserName',
+            method: 'POST',
+            token: true
+        },{
+            name: 'emailToUpdateTel',
+            url: '/emailToUpdateTel',
+            method: 'POST',
+            token: true
+        },{
+            name: 'sendSMSAuth',
+            url: '/sendSMSAuth',
+            method: 'POST',
+            token: true
+        },{
+            name: 'verifySMS',
+            url: '/verifySMS',
+            method: 'POST',
+            token: true
+        },{
+            name: 'checkPhoneAgain',
+            url: '/checkPhoneAgain',
+            method: 'POST',
+            token: true
+        },{
+            name: 'updatePassword',
+            url: '/updatePassword',
+            method: 'POST',
+            token: true
         }
     ];
     // init necessary fields
@@ -222,16 +257,24 @@ function init (options) {
             };
         });
         setInterval(function(){
-            async.retry({times: 5, interval: 5000}, function (cbRetry, ret) {
-                model.updateToken(cbRetry);
-            }, function (err, res) {
+            async.whilst(function () {
+                return true;
+            }, function (callback) {
+                async.retry({times: 10, interval: 1 * 60 * 1000}, function (cbRetry, ret) {
+                    model.updateToken(cbRetry);
+                }, function (err, res) {
                     if (err) {
                         console.error('Update Token Fail');
+                        callback();
                     } else {
                         model.token = res.token;
                         console.log('token update', new Date(), model.token);
+                        callback('update success');
                     }
-            });
+                });
+            }, function (err) {
+                console.log(err, model.token);
+            })
         }, options.refresh * 60 * 60 * 1000);
     } else {
         console.error('Missing required parameters');
