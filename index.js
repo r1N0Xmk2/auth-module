@@ -33,6 +33,16 @@ function init (options) {
             method: 'POST',
             token: true
         }, {
+            name: 'createUserByEmail',
+            url: '/createUserByEmail',
+            method: 'POST',
+            token: true
+        }, {
+            name: 'getUserByEmail',
+            url: '/getUserByEmail',
+            method: 'POST',
+            token: true
+        }, {
             name: 'getUserByAccount',
             url: '/getUserByAccount',
             method: 'POST',
@@ -65,6 +75,11 @@ function init (options) {
         }, {
             name: 'checkPhoneNum',
             url: '/checkPhoneNum',
+            method: 'POST',
+            token: true
+        }, {
+            name: 'clearPhoneNum',
+            url: '/clearPhoneNum',
             method: 'POST',
             token: true
         }, {
@@ -117,8 +132,53 @@ function init (options) {
             url: '/updatePassword',
             method: 'POST',
             token: true
+        },{
+            //修改个人信息的手机号和邮箱
+            name: 'editEmailAndPhone',
+            url: '/editEmailAndPhone',
+            method: 'POST',
+            token: true
+        },{
+            //修改密码
+            name: 'restPassword',
+            url: '/restPassword',
+            method: 'POST',
+            token: true
+        },{
+            name:'emailToUpdateEmail',
+            url:'/emailToUpdateEmail',
+            method:'POST',
+            token:true
+        },{
+            name:'checkAccount',
+            url:'/checkAccount',
+            method:'POST',
+            token:true
+        },{
+            name:'signInByEmail',
+            url:'/signInByEmail',
+            method:'POST',
+            token:true
+        },{
+            name:'appCheckAccount',
+            url:'/appCheckAccount',
+            method:'POST',
+            token:false
+        },{
+            name:'appForgetPassword',
+            url:'/appForgetPassword',
+            method:'POST',
+            token:false
+        },{
+            name:'checkEmail',
+            url:'/checkEmail',
+            method:'POST',
+            token:true
         }
     ];
+    if (options.funs && options.funs.length ) {
+        ownedFuns = ownedFuns.concat(options.funs)
+    }
     // init necessary fields
     var necessaryFields = ['agentName', 'agentKey', 'authAddr'];
     options.refresh = options.refresh || 5;
@@ -145,7 +205,6 @@ function init (options) {
             });
         };
         model.updateToken = function (callback) {
-            console.log('update token', model.options.authAddr+'/updateToken');
             if (!model.token) {
                 return model.getToken({}, callback);
             } else {
@@ -231,6 +290,7 @@ function init (options) {
                         } else {
                             reqOptions.json = paramsClone;
                         }
+                        console.error('request auth node options', reqOptions)
                         request(reqOptions, function (err, res, body) {
                             if (err) {
                                 callback(err);
@@ -239,6 +299,7 @@ function init (options) {
                                     if (typeof body == 'string')
                                         body=JSON.parse(body);
                                 }catch(e){
+                                    console.error('Auth module Parse result Error', e,body)
                                     return callback('Auth module Parse result Error')
                                 }
                                 if (body.res > 0) {
@@ -268,7 +329,6 @@ function init (options) {
                         callback();
                     } else {
                         model.token = res.token;
-                        console.log('token update', new Date(), model.token);
                         callback('update success');
                     }
                 });
@@ -279,6 +339,14 @@ function init (options) {
     } else {
         console.error('Missing required parameters');
     }
+
+    model.changeOptions=function (opt) {
+        model.options = opt;
+        model.updateToken(function (err, ret) {
+            if (err) console.log('updateFail');
+        })
+    }
+
     // Make Promise Functions
     Object.getOwnPropertyNames(model).filter(function (funName) {
         return _.isFunction(model[funName]);
